@@ -1,0 +1,164 @@
+@model TransferTaskViewModel
+@{
+    ViewData["Title"] = "Görevi Aktar / Yönlendir";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3>Görevi Aktar / Yönlendir</h3>
+            </div>
+            <div class="card-body">
+                
+                <div class="alert alert-info">
+                    <strong>Görev:</strong> @Model.TaskTitle
+                </div>
+
+                @if (Model.IsFlagged)
+                {
+                    <div class="alert alert-danger">
+                        Bu görev "Hatalı" olarak işaretlendi. Lütfen görevi doğru Departman/Kategoriye yönlendirin.
+                    </div>
+                }
+
+                <form asp-action="TransferTask" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="TaskId" />
+                    <input type="hidden" asp-for="IsFlagged" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    @if (Model.IsFlagged)
+                    {
+                        <div class="mb-3">
+                            <label asp-for="NewDepartmentId" class="form-label"></label>
+                            <select asp-for="NewDepartmentId" id="DepartmentId" class="form-select" asp-items="ViewBag.Departments">
+                                <option value="">-- Departman Seçin --</option>
+                            </select>
+                            <span asp-validation-for="NewDepartmentId" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="NewCategoryId" class="form-label"></label>
+                            <select asp-for="NewCategoryId" id="CategoryId" class="form-select" disabled>
+                                <option value="">-- Önce Departman Seçin --</option>
+                            </select>
+                            <span asp-validation-for="NewCategoryId" class="text-danger"></span>
+                        </div>
+                        <hr />
+                    }
+                    
+                    <div class="mb-3">
+                        <label asp-for="NewAssigneeId" class="form-label"></label>
+                        <select asp-for="NewAssigneeId" id="AssigneeId" class="form-select" asp-items="ViewBag.Users">
+                            <option value="">-- Kişi Seçin --</option>
+                        </select>
+                        <span asp-validation-for="NewAssigneeId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Comment" class="form-label"></label>
+                        <textarea asp-for="Comment" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Comment" class="text-danger"></span>
+                    </div>
+
+                    <hr />
+                    <button type="submit" class="btn btn-primary">Görevi Aktar</button>
+                    <a asp-action="Details" asp-route-id="@Model.TaskId" class="btn btn-secondary">İptal</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            
+            // ID'leri JavaScript'in beklediği gibi (Create.cshtml'deki gibi) yakala
+            var deptDropdown = $("#DepartmentId");
+            var catDropdown = $("#CategoryId");
+            var userDropdown = $("#AssigneeId");
+
+            // --- 1. Departman değiştiğinde KATEGORİLERİ ve KULLANICILARI getir ---
+            // Bu sadece Model.IsFlagged == true ise çalışır, çünkü 'deptDropdown' sadece o zaman DOM'dadır
+            deptDropdown.on("change", function () {
+                var deptId = $(this).val();
+                
+                // Kategorileri yükle
+                loadCategories(deptId);
+                
+                // 'Hatalı' görevler için, departman değişince kullanıcı listesini de yenile
+                if (@Model.IsFlagged.ToString().ToLower()) {
+                    loadUsers(deptId);
+                }
+            });
+
+            // --- 2. Kategori değiştiğinde Sorumlu Kullanıcıyı otomatik seç ---
+            catDropdown.on("change", function () {
+                var catId = $(this).val();
+                selectResponsibleUser(catId);
+            });
+            
+            // --- YARDIMCI FONKSİYONLAR (Create.cshtml ile aynı) ---
+
+            function loadCategories(deptId) {
+                catDropdown.empty().append('<option value="">-- Yükleniyor... --</option>');
+                if (!deptId) {
+                    catDropdown.empty().append('<option value="">-- Önce Departman Seçin --</option>').prop("disabled", true);
+                    return;
+                }
+                $.getJSON("/Task/GetCategories", { departmentId: deptId }, function (data) {
+                    catDropdown.empty().append('<option value="">-- Kategori Seçin --</option>');
+                    $.each(data, function (index, item) {
+                        catDropdown.append($('<option>', { value: item.value, text: item.text }));
+                    });
+                    catDropdown.prop("disabled", false);
+                });
+            }
+            
+            function loadUsers(deptId) {
+                userDropdown.empty().append('<option value="">-- Yükleniyor... --</option>').prop("disabled", true);
+                $.getJSON("/Task/GetUsersForDepartment", { departmentId: deptId || null }, function (data) {
+                    userDropdown.empty().append('<option value="">-- Kişi Seçin --</option>');
+                    $.each(data, function (index, item) {
+                        userDropdown.append($('<option>', { value: item.value, text: item.text }));
+                    });
+                    userDropdown.prop("disabled", false);
+                });
+            }
+            
+            function selectResponsibleUser(catId) {
+                if (!catId) {
+                    userDropdown.val("");
+                    return;
+                }
+                $.getJSON("/Task/GetResponsibleUser", { categoryId: catId }, function (data) {
+                    if (data && data.userId > 0) {
+                        userDropdown.val(data.userId);
+                    }
+                    else {
+                        userDropdown.val("");
+                    }
+                });
+            }
+
+            // --- SAYFA YÜKLENDİĞİNDE ---
+            // Eğer form, validasyon hatası nedeniyle geri yüklendiyse
+            // ve bir departman zaten seçiliyse, Kategori listesini doldur
+            var selectedDeptId = deptDropdown.val();
+            if (selectedDeptId) {
+                loadCategories(selectedDeptId);
+                // Kategoriyi de (varsa) yeniden seç
+                var selectedCatId = '@Model.NewCategoryId';
+                if(selectedCatId) {
+                    // AJAX çağrısı bittikten sonra seçmek için kısa bir gecikme
+                    setTimeout(function() {
+                        catDropdown.val(selectedCatId);
+                    }, 500); 
+                }
+            }
+
+        });
+    </script>
+}

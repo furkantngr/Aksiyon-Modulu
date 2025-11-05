@@ -1,0 +1,240 @@
+@model TaskDashboardViewModel
+@using HierarchicalTaskApp.Models
+@using System.Text.Json
+@* Grafik verisini C#'tan JSON'a çevirmek için eklendi *@
+@{
+    ViewData["Title"] = Model.LoggedInUserRole == UserRole.Employee ? "Görevlerim" : "Görev Paneli";
+    
+    var users = ViewBag.Users as List<User> ?? new List<User>();
+    
+    // DEĞİŞTİ: .Name -> .FullName
+    Func<int, string> GetUserName = (id) => 
+        users.FirstOrDefault(u => u.Id == id)?.FullName ?? "N/A";
+    
+    async Task RenderTaskTable(List<ActionTask> tasks, bool showAssigner)
+    {
+        <table class="table table-hover table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>Öncelik</th>
+                    <th>Başlık</th>
+                    <th>Atanan</th>
+                    @if (showAssigner) { <th>Atayan</th> }
+                    <th>Son Tarih</th>
+                    <th>Durum</th>
+                    <th>Eylemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!tasks.Any())
+                {
+                    <tr>
+                        <td colspan="@(showAssigner ? 7 : 6)" class="text-center">Görev bulunamadı.</td>
+                    </tr>
+                }
+                
+                @foreach (var task in tasks.OrderByDescending(t => t.Flag).ThenByDescending(t => t.Priority).ThenBy(t => t.Status))
+                {
+                    <tr class="@(task.Flag == FlagStatus.FlaggedAsIncorrect ? "table-danger" : "")">
+                        <td>
+                            @switch (task.Priority)
+                            {
+                                case TaskPriority.Urgent: <span class="badge bg-danger">Acil</span>; break;
+                                case TaskPriority.High: <span class="badge bg-warning text-dark">Yüksek</span>; break;
+                                case TaskPriority.Low: <span class="badge bg-secondary">Düşük</span>; break;
+                                default: <span class="badge bg-info text-dark">Normal</span>; break;
+                            }
+                        </td>
+                        <td>
+                            @if(task.Flag == FlagStatus.FlaggedAsIncorrect)
+                            {
+                                <span title="Hatalı Görev Bildirimi!">🚨</span>
+                            }
+                            @task.Title
+                        </td>
+                        <td><strong>@GetUserName(task.AssigneeId)</strong></td>
+                        @if (showAssigner) { <td>@GetUserName(task.AssignerId)</td> }
+                        <td>
+                            @if (task.Deadline.HasValue) { @task.Deadline.Value.ToString("dd MMM yyyy") }
+                            @if (task.Deadline.HasValue && task.Deadline.Value < DateTime.Now.Date && task.Status != HierarchicalTaskApp.Models.TaskStatus.Done)
+                            { <span class="badge bg-danger ms-1">Gecikmiş</span> }
+                        </td>
+                        <td>
+                            @switch (task.Status)
+                            {
+                                case HierarchicalTaskApp.Models.TaskStatus.Done: <span class="badge bg-success">Tamamlandı</span>; break;
+                                case HierarchicalTaskApp.Models.TaskStatus.InProgress: <span class="badge bg-warning text-dark">Devam Ediyor</span>; break;
+                                default: <span class="badge bg-secondary">Beklemede</span>; break;
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@task.Id" class="btn btn-info btn-sm">Detay</a>
+                            <a asp-action="UpdateStatus" asp-route-id="@task.Id" class="btn btn-primary btn-sm">Güncelle</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>@ViewData["Title"]</h1>
+    
+    @if (Model.LoggedInUserRole != UserRole.Employee)
+    {
+        <div>
+            <a asp-action="DownloadReport" class="btn btn-outline-danger">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16">
+                  <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                  <path d="M4.603 14.087a.81.81 0 0 1-.438-.42l-2.5-5.5a.81.81 0 0 1 .438-1.03a.81.81 0 0 1 1.03.438l1.89 4.153 1.89-4.153a.81.81 0 0 1 1.03-.438.81.81 0 0 1 .438 1.03l-2.5 5.5a.81.81 0 0 1-.438.42z"/>
+                </svg>
+                PDF Rapor Al
+            </a>
+            
+            <a asp-action="Create" class="btn btn-success ms-2">
+                <i class="bi bi-plus-circle"></i> Yeni Görev Oluştur
+            </a>
+        </div>
+    }
+</div>
+
+
+@switch (Model.LoggedInUserRole)
+{
+    // --- 1. YÖNETİCİ GÖRÜNÜMÜ ---
+    case UserRole.Manager:
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5 class="mb-0">Hiyerarşik Görev Durum Dağılımı</h5>
+                    </div>
+                    <div class="card-body">
+                        <div style="max-height: 300px;">
+                            <canvas id="taskStatusPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <ul class="nav nav-tabs" id="taskTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="true">
+                    Görev Paneli (Hiyerarşik)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="my-tasks-tab" data-bs-toggle="tab" data-bs-target="#my-tasks" type="button" role="tab" aria-controls="my-tasks" aria-selected="false">
+                    Benim Atadığım Görevler
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content" id="taskTabsContent">
+            <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                <div class="card shadow-sm border-top-0"><div class="card-body">
+                    @{ await RenderTaskTable(Model.HierarchicalTasks, true); }
+                </div></div>
+            </div>
+            <div class="tab-pane fade" id="my-tasks" role="tabpanel" aria-labelledby="my-tasks-tab">
+                <div class="card shadow-sm border-top-0"><div class="card-body">
+                    @{ await RenderTaskTable(Model.TasksAssignedByMe, false); }
+                </div></div>
+            </div>
+        </div>
+        break;
+
+    // --- 2. TAKIM LİDERİ GÖRÜNÜMÜ ---
+    case UserRole.TeamLeader:
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5 class="mb-0">Ekibimin Görev Durum Dağılımı</h5>
+                    </div>
+                    <div class="card-body">
+                        <div style="max-height: 300px;">
+                            <canvas id="taskStatusPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <ul class="nav nav-tabs" id="taskTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="team-tasks-tab" data-bs-toggle="tab" data-bs-target="#team-tasks" type="button" role="tab" aria-controls="team-tasks" aria-selected="true">
+                    Ekibimin Görevleri
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="my-own-tasks-tab" data-bs-toggle="tab" data-bs-target="#my-own-tasks" type="button" role="tab" aria-controls="my-own-tasks" aria-selected="false">
+                    Kendi Görevlerim
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content" id="taskTabsContent">
+            <div class="tab-pane fade show active" id="team-tasks" role="tabpanel" aria-labelledby="team-tasks-tab">
+                <div class="card shadow-sm border-top-0"><div class="card-body">
+                    @{ await RenderTaskTable(Model.HierarchicalTasks, true); }
+                </div></div>
+            </div>
+            <div class="tab-pane fade" id="my-own-tasks" role="tabpanel" aria-labelledby="my-own-tasks-tab">
+                <div class="card shadow-sm border-top-0"><div class="card-body">
+                    @{ await RenderTaskTable(Model.TasksAssignedToMe, false); }
+                </div></div>
+            </div>
+        </div>
+        break;
+
+    // --- 3. ÇALIŞAN GÖRÜNÜMÜ ---
+    case UserRole.Employee:
+        <div class="card shadow-sm">
+            <div class="card-body">
+                @{ await RenderTaskTable(Model.TasksAssignedToMe, false); }
+            </div>
+        </div>
+        break;
+}
+
+
+@section Scripts {
+    @if (Model.LoggedInUserRole != UserRole.Employee && Model.ChartData.Any())
+    {
+        <script>
+            $(document).ready(function () {
+                var chartLabels = @Html.Raw(JsonSerializer.Serialize(Model.ChartLabels));
+                var chartData = @Html.Raw(JsonSerializer.Serialize(Model.ChartData));
+
+                var ctx = document.getElementById('taskStatusPieChart').getContext('2d');
+                
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'Görev Sayısı',
+                            data: chartData,
+                            backgroundColor: [
+                                'rgb(108, 117, 125)', // Beklemede (Gri)
+                                'rgb(255, 193, 7)',  // Devam Ediyor (Sarı)
+                                'rgb(25, 135, 84)'   // Tamamlandı (Yeşil)
+                            ],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top', 
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
+    }
+}

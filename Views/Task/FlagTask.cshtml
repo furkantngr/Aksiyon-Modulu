@@ -1,0 +1,38 @@
+@model FlagTaskViewModel
+@{
+    ViewData["Title"] = "Görevi Hatalı Olarak İşaretle";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3>Hatalı Görev Bildirimi</h3>
+            </div>
+            <div class="card-body">
+                
+                <div class="alert alert-info">
+                    <strong>Görev:</strong> @Model.TaskTitle
+                </div>
+                <div class="alert alert-warning">
+                    <p class="mb-0">Bu görevin size veya departmanınıza yanlışlıkla atandığını düşünüyorsanız, lütfen nedenini açıklayın. Bu bildirim, yöneticinize (müdürünüze) iletilecektir.</p>
+                </div>
+
+                <form asp-action="FlagTask" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="TaskId" />
+                    
+                    <div class="mb-3">
+                        <label asp-for="FlagComment" class="form-label"></label>
+                        <textarea asp-for="FlagComment" class="form-control" rows="5"></textarea>
+                        <span asp-validation-for="FlagComment" class="text-danger"></span>
+                    </div>
+
+                    <hr />
+                    <button type-="submit" class="btn btn-danger">Hatalı Olarak Bildir</button>
+                    <a asp-action="Details" asp-route-id="@Model.TaskId" class="btn btn-secondary">İptal</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

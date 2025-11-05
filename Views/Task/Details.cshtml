@@ -1,0 +1,274 @@
+@model ActionTask
+@using HierarchicalTaskApp.Models
+@{
+    ViewData["Title"] = "Görev Detayları";
+    
+    var history = ViewBag.History as List<TaskHistory> ?? new List<TaskHistory>();
+    var users = ViewBag.Users as List<User> ?? new List<User>();
+    var comments = ViewBag.Comments as List<TaskComment> ?? new List<TaskComment>();
+    var workLogs = ViewBag.WorkLogs as List<WorkLog> ?? new List<WorkLog>();
+    var categories = ViewBag.Categories as List<Category> ?? new List<Category>();
+    
+    var userRole = (UserRole)(ViewBag.UserRole ?? UserRole.Employee);
+    var currentUserId = (int)(ViewBag.CurrentUserId ?? 0);
+    var assigneesManagerId = (int)(ViewBag.AssigneesManagerId ?? 0);
+    var canTransfer = (bool)(ViewBag.CanTransfer ?? false);
+    
+    // DEĞİŞTİ: .Name -> .FullName
+    Func<int, string> GetUserName = (id) => 
+        users.FirstOrDefault(u => u.Id == id)?.FullName ?? "N/A";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Görev: @Model.Title</h1>
+
+    <div>
+        @if (Model.AssigneeId == currentUserId)
+        {
+            <a asp-action="UpdateStatus" asp-route-id="@Model.Id" class="btn btn-primary">
+                Durumu Güncelle
+            </a>
+        }
+
+        @if (canTransfer)
+        {
+            <a asp-action="TransferTask" asp-route-id="@Model.Id" class="btn btn-warning ms-2">
+                Görevi Yönlendir/Aktar
+            </a>
+        }
+
+        @if (currentUserId == assigneesManagerId)
+        {
+            <a asp-action="UpdatePriority" asp-route-id="@Model.Id" class="btn btn-outline-danger ms-2">
+                Öncelik Değiştir
+            </a>
+        }
+
+        @if (Model.AssigneeId == currentUserId && Model.Flag == FlagStatus.None)
+        {
+            <a asp-action="FlagTask" asp-route-id="@Model.Id" class="btn btn-outline-secondary ms-2">
+                Hatalı Bildir
+            </a>
+        }
+    </div>
+</div>
+
+@if (TempData["WorkLogError"] != null)
+{
+    <div class="alert alert-danger">@TempData["WorkLogError"]</div>
+}
+@if (TempData["WorkLogSuccess"] != null)
+{
+    <div class="alert alert-success">@TempData["WorkLogSuccess"]</div>
+}
+
+@if (Model.Flag == FlagStatus.FlaggedAsIncorrect)
+{
+    <div class="alert alert-danger d-flex align-items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </svg>
+        <div>
+            Bu görev, atanan kişi tarafından <strong>HATALI</strong> olarak işaretlendi. Lütfen görevi inceleyip doğru kişiye/departmana yönlendirin (Aktar Butonu).
+        </div>
+    </div>
+}
+
+
+<div class="row">
+    <div class="col-lg-7">
+        
+        <div class="card shadow-sm mb-4">
+            <div class="card-header"><h5 class="mb-0">Görev Detayları</h5></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Başlık:</strong> @Model.Title</p>
+                        <p><strong>Atayan:</strong> @GetUserName(Model.AssignerId)</p>
+                        <p><strong>Atanan:</strong> <strong>@GetUserName(Model.AssigneeId)</strong></p>
+                    </div>
+                    <div class="col-md-6">
+                        
+                        <p><strong>Öncelik:</strong> 
+                            @switch (Model.Priority)
+                            {
+                                case TaskPriority.Urgent: <span class="badge bg-danger">Acil</span>; break;
+                                case TaskPriority.High: <span class="badge bg-warning text-dark">Yüksek</span>; break;
+                                case TaskPriority.Low: <span class="badge bg-secondary">Düşük</span>; break;
+                                default: <span class="badge bg-info text-dark">Normal</span>; break;
+                            }
+                        </p>
+                        
+                        <p><strong>Durum:</strong> 
+                            @switch (Model.Status)
+                            {
+                                case HierarchicalTaskApp.Models.TaskStatus.Done: <span class="badge bg-success">Tamamlandı</span>; break;
+                                case HierarchicalTaskApp.Models.TaskStatus.InProgress: <span class="badge bg-warning text-dark">Devam Ediyor</span>; break;
+                                default: <span class="badge bg-secondary">Beklemede</span>; break;
+                            }
+                        </p>
+                        <p><strong>Son Teslim Tarihi:</strong> 
+                            @if (Model.Deadline.HasValue)
+                            {
+                                @Model.Deadline.Value.ToString("D")
+                                if (Model.Deadline.Value < DateTime.Now.Date && Model.Status != HierarchicalTaskApp.Models.TaskStatus.Done)
+                                { <span class="badge bg-danger ms-1">Gecikmiş</span> }
+                            }
+                            else
+                            { <span class="text-muted">Belirtilmemiş</span> }
+                        </p>
+                    </div>
+                </div>
+                <hr />
+                <p class="mb-1"><strong>Departman:</strong> @(categories.FirstOrDefault(c => c.DepartmentId == Model.DepartmentId)?.Name ?? "N/A")</p>
+                <p class="mb-1"><strong>Kategori:</strong> @(categories.FirstOrDefault(c => c.Id == Model.CategoryId)?.Name ?? "N/A")</p>
+                <hr />
+                <p class="mb-1"><strong>Açıklama:</strong></p>
+                <p class="mb-0" style="white-space: pre-wrap;">@Model.Description</p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header"><h5 class="mb-0">Görev Geçmişi (Log)</h5></div>
+            <div class="card-body p-0">
+                @if (!history.Any())
+                {
+                    <p class="p-3 text-center">Bu görev için geçmiş kaydı bulunamadı.</p>
+                }
+                else
+                {
+                    <table class="table table-striped mb-0 small">
+                        <thead class="table-light">
+                            <tr><th>Tarih</th><th>Kullanıcı</th><th>Değişiklik</th><th>Yorum</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in history)
+                            {
+                                <tr>
+                                    <td>@item.ChangeDate.ToString("g")</td>
+                                    <td>@GetUserName(item.UserId)</td>
+                                    <td>
+                                        @if (item.OldStatus.HasValue)
+                                        {
+                                            @switch (item.OldStatus)
+                                            {
+                                                case HierarchicalTaskApp.Models.TaskStatus.Done: <span class="badge bg-success">Tamamlandı</span>; break;
+                                                case HierarchicalTaskApp.Models.TaskStatus.InProgress: <span class="badge bg-warning text-dark">Devam Ediyor</span>; break;
+                                                default: <span class="badge bg-secondary">Beklemede</span>; break;
+                                            }
+                                            <span>&rarr;</span>
+                                            @switch (item.NewStatus)
+                                            {
+                                                case HierarchicalTaskApp.Models.TaskStatus.Done: <span class="badge bg-success">Tamamlandı</span>; break;
+                                                case HierarchicalTaskApp.Models.TaskStatus.InProgress: <span class="badge bg-warning text-dark">Devam Ediyor</span>; break;
+                                                default: <span class="badge bg-secondary">Beklemede</span>; break;
+                                            }
+                                        }
+                                        else { <span class="badge bg-info text-dark">Oluşturuldu</span> }
+                                    </td>
+                                    <td><em>@item.Comment</em></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-5">
+        
+        <div class="card shadow-sm mb-4">
+            <div class="card-header"><h5 class="mb-0">Zaman Kayıtları (Toplam: @workLogs.Sum(l => l.HoursSpent) saat)</h5></div>
+            
+            <div class="card-body border-bottom">
+                <form asp-action="AddWorkLog" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="actionTaskId" value="@Model.Id" />
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label for="logDate" class="form-label small mb-1">Tarih</label>
+                            <input type="date" name="logDate" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="hoursSpent" class="form-label small mb-1">Harcanan Süre (Saat)</label>
+                            <input type="text" name="hoursSpent" class="form-control" inputmode="decimal" placeholder="örn: 2,5" required />
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label for="workSummary" class="form-label small mb-1">Çalışma Özeti</label>
+                        <textarea name="workSummary" class="form-control" rows="2" placeholder="Ne yaptınız?" required></textarea>
+                    </div>
+                    @if (TempData["WorkLogError"] != null)
+                    {
+                        <div class="alert alert-danger p-2 small">@TempData["WorkLogError"]</div>
+                    }
+                    @if (TempData["WorkLogSuccess"] != null)
+                    {
+                         <div class="alert alert-success p-2 small">@TempData["WorkLogSuccess"]</div>
+                    }
+                    <button type="submit" class="btn btn-success w-100">Zaman Kaydı Ekle</button>
+                </form>
+            </div>
+            
+            <div class="card-body" style="max-height: 250px; overflow-y: auto;">
+                @if (!workLogs.Any())
+                {
+                    <p class="text-center text-muted small mb-0">Henüz zaman kaydı girilmemiş.</p>
+                }
+                @foreach (var log in workLogs)
+                {
+                    <div class="mb-2 border-bottom pb-2">
+                        <div class="d-flex justify-content-between">
+                            <strong>@GetUserName(log.UserId)</strong>
+                            <span class="badge bg-primary">@log.HoursSpent saat</span>
+                        </div>
+                        <div class="text-muted small mb-1">@log.LogDate.ToString("D")</div>
+                        <p class="mb-0 small" style="white-space: pre-wrap;">@log.WorkSummary</p>
+                    </div>
+                }
+            </div>
+        </div>
+        
+        <div class="card shadow-sm">
+            <div class="card-header"><h5 class="mb-0">Yorumlar</h5></div>
+            <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                @if (!comments.Any())
+                {
+                    <p class="text-center text-muted">Henüz yorum yapılmamış.</p>
+                }
+                @foreach (var comment in comments)
+                {
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <strong>@GetUserName(comment.AuthorUserId)</strong>
+                            <span class="text-muted small">@comment.CreatedAt.ToString("g")</span>
+                        </div>
+                        <div class="bg-light p-2 rounded" style="white-space: pre-wrap;">
+                            @comment.CommentText
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                <form asp-action="AddTaskComment" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="actionTaskId" value="@Model.Id" />
+                    <div class="mb-2">
+                        <label for="commentText" class="form-label">Yeni Yorum Ekle</label>
+                        <textarea name="commentText" class="form-control" rows="3"></textarea>
+                    </div>
+                    @if (TempData["CommentError"] != null)
+                    {
+                        <div class="alert alert-danger p-2 small">@TempData["CommentError"]</div>
+                    }
+                    <button type="submit" class="btn btn-primary w-100">Yorum Yap</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="Index" class="btn btn-secondary">Listeye Dön</a>
+</div>

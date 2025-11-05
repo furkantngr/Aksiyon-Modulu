@@ -1,0 +1,326 @@
+{
+  "Users": [
+    {
+      "Id": 1,
+      "FirstName": "Sare",
+      "LastName": "Yılmaz (Genel Müdür)",
+      "Role": "Manager",
+      "ManagerId": null,
+      "DepartmentId": null
+    },
+    {
+      "Id": 10,
+      "FirstName": "Ahmet",
+      "LastName": "Kaya (Teknik Müdür)",
+      "Role": "Manager",
+      "ManagerId": 1,
+      "DepartmentId": 1
+    },
+    {
+      "Id": 11,
+      "FirstName": "Burak",
+      "LastName": "Öz (Yazılım Lideri)",
+      "Role": "TeamLeader",
+      "ManagerId": 10,
+      "DepartmentId": 1
+    },
+    {
+      "Id": 12,
+      "FirstName": "Ceyda",
+      "LastName": "Can (Yazılımcı)",
+      "Role": "Employee",
+      "ManagerId": 11,
+      "DepartmentId": 1
+    },
+    {
+      "Id": 13,
+      "FirstName": "Deniz",
+      "LastName": "Ak (Altyapı Uzmanı)",
+      "Role": "Employee",
+      "ManagerId": 11,
+      "DepartmentId": 1
+    },
+    {
+      "Id": 20,
+      "FirstName": "Elif",
+      "LastName": "Demir (Operasyon Müd.)",
+      "Role": "Manager",
+      "ManagerId": 1,
+      "DepartmentId": 2
+    },
+    {
+      "Id": 21,
+      "FirstName": "Fatih",
+      "LastName": "Güneş (Destek Lideri)",
+      "Role": "TeamLeader",
+      "ManagerId": 20,
+      "DepartmentId": 2
+    },
+    {
+      "Id": 22,
+      "FirstName": "Gamze",
+      "LastName": "Bulut (Destek Uzmanı)",
+      "Role": "Employee",
+      "ManagerId": 21,
+      "DepartmentId": 2
+    },
+    {
+      "Id": 23,
+      "FirstName": "Hakan",
+      "LastName": "Taş (Bakım Uzmanı)",
+      "Role": "Employee",
+      "ManagerId": 21,
+      "DepartmentId": 2
+    },
+    {
+      "Id": 30,
+      "FirstName": "Işıl",
+      "LastName": "Vural (İK Müdürü)",
+      "Role": "Manager",
+      "ManagerId": 1,
+      "DepartmentId": 3
+    },
+    {
+      "Id": 31,
+      "FirstName": "Kemal",
+      "LastName": "Kurt (İşe Alım Lideri)",
+      "Role": "TeamLeader",
+      "ManagerId": 30,
+      "DepartmentId": 3
+    },
+    {
+      "Id": 32,
+      "FirstName": "Leyla",
+      "LastName": "Ateş (İşe Alım Uzmanı)",
+      "Role": "Employee",
+      "ManagerId": 31,
+      "DepartmentId": 3
+    },
+    {
+      "Id": 33,
+      "FirstName": "Mehmet",
+      "LastName": "Su (Bordro Uzmanı)",
+      "Role": "Employee",
+      "ManagerId": 31,
+      "DepartmentId": 3
+    }
+  ],
+  "Tasks": [
+    {
+      "Id": 1,
+      "Title": "Yeni Personel Bilgisayarlarını Kur",
+      "Description": "İşe yeni başlayan 2 çalışan (Leyla ve Mehmet) için notebook kurulumlarını yap.",
+      "AssignerId": 10,
+      "AssigneeId": 13,
+      "Status": "Todo",
+      "Deadline": "2025-11-10T00:00:00",
+      "DepartmentId": 1,
+      "CategoryId": 102,
+      "Priority": "Normal",
+      "Flag": "None"
+    },
+    {
+      "Id": 2,
+      "Title": "Destek Hattı Raporlarını Hazırla",
+      "Description": "Aylık destek talebi (ticket) raporlarını hazırla ve Operasyon Müdürüne (Elif) ilet.",
+      "AssignerId": 20,
+      "AssigneeId": 21,
+      "Status": "InProgress",
+      "Deadline": "2025-11-08T00:00:00",
+      "DepartmentId": 2,
+      "CategoryId": 203,
+      "Priority": "Normal",
+      "Flag": "None"
+    },
+    {
+      "Id": 3,
+      "Title": "Yeni Çalışan Eğitimlerini Planla",
+      "Description": "Yeni çalışanlar için oryantasyon ve iş güvenliği eğitimlerini planla.",
+      "AssignerId": 30,
+      "AssigneeId": 11,
+      "Status": "Todo",
+      "Deadline": "2025-11-15T00:00:00",
+      "DepartmentId": 1,
+      "CategoryId": 103,
+      "Priority": "Low",
+      "Flag": "None"
+    },
+    {
+      "Id": 4,
+      "Title": "aa",
+      "Description": "aa",
+      "AssignerId": 1,
+      "AssigneeId": 23,
+      "Status": "Todo",
+      "Deadline": "2025-11-12T00:00:00",
+      "DepartmentId": 2,
+      "CategoryId": 202,
+      "Priority": "Normal",
+      "Flag": "None"
+    }
+  ],
+  "TaskHistories": [
+    {
+      "Id": 1,
+      "ActionTaskId": 2,
+      "UserId": 21,
+      "OldStatus": "Todo",
+      "NewStatus": "InProgress",
+      "Comment": "Raporları çekmeye başladım.",
+      "ChangeDate": "2025-11-05T10:00:00"
+    },
+    {
+      "Id": 2,
+      "ActionTaskId": 4,
+      "UserId": 1,
+      "OldStatus": null,
+      "NewStatus": "Todo",
+      "Comment": "Görev Oluşturuldu.",
+      "ChangeDate": "2025-11-05T15:47:08.0756791+03:00"
+    },
+    {
+      "Id": 3,
+      "ActionTaskId": 4,
+      "UserId": 12,
+      "OldStatus": "Todo",
+      "NewStatus": "Todo",
+      "Comment": "Görev, \u0027Ceyda Can (Yazılımcı)\u0027 tarafından HATALI olarak işaretlendi.\nBildirim Notu: bu yazılım değil",
+      "ChangeDate": "2025-11-05T15:47:24.5700641+03:00"
+    },
+    {
+      "Id": 4,
+      "ActionTaskId": 4,
+      "UserId": 11,
+      "OldStatus": "Todo",
+      "NewStatus": "Todo",
+      "Comment": "Görev, \u0027Burak Öz (Yazılım Lideri)\u0027 tarafından \u0027Ceyda Can (Yazılımcı)\u0027 kullanıcısından \u0027Kemal Kurt (İşe Alım Lideri)\u0027 kullanıcısına aktarıldı.\nAktarma Notu: Aktarma Notu: sadfsad\nGörev, \u0027İnsan Kaynakları\u0027 departmanına yeniden yönlendirildi.",
+      "ChangeDate": "2025-11-05T16:11:58.7178585+03:00"
+    },
+    {
+      "Id": 5,
+      "ActionTaskId": 1,
+      "UserId": 11,
+      "OldStatus": "Todo",
+      "NewStatus": "Todo",
+      "Comment": "Görev önceliği \u0027High\u0027 seviyesinden \u0027Normal\u0027 seviyesine değiştirildi.",
+      "ChangeDate": "2025-11-05T16:21:01.4014573+03:00"
+    },
+    {
+      "Id": 6,
+      "ActionTaskId": 4,
+      "UserId": 31,
+      "OldStatus": "Todo",
+      "NewStatus": "Todo",
+      "Comment": "Görev, \u0027Kemal Kurt (İşe Alım Lideri)\u0027 tarafından HATALI olarak işaretlendi.\nBildirim Notu: ss",
+      "ChangeDate": "2025-11-05T16:21:40.3700419+03:00"
+    },
+    {
+      "Id": 7,
+      "ActionTaskId": 4,
+      "UserId": 1,
+      "OldStatus": "Todo",
+      "NewStatus": "Todo",
+      "Comment": "Görev, \u0027Sare Yılmaz (Genel Müdür)\u0027 tarafından \u0027Kemal Kurt (İşe Alım Lideri)\u0027 kullanıcısından \u0027Hakan Taş (Bakım Uzmanı)\u0027 kullanıcısına aktarıldı.\nAktarma Notu: Aktarma Notu: ss\nGörev, \u0027Operasyon Departmanı\u0027 departmanına yeniden yönlendirildi.",
+      "ChangeDate": "2025-11-05T16:21:55.3946602+03:00"
+    },
+    {
+      "Id": 8,
+      "ActionTaskId": 3,
+      "UserId": 32,
+      "OldStatus": "Todo",
+      "NewStatus": "Todo",
+      "Comment": "Görev, \u0027Leyla Ateş (İşe Alım Uzmanı)\u0027 tarafından HATALI olarak işaretlendi.\nBildirim Notu: zs",
+      "ChangeDate": "2025-11-05T16:29:28.872795+03:00"
+    },
+    {
+      "Id": 9,
+      "ActionTaskId": 3,
+      "UserId": 30,
+      "OldStatus": "Todo",
+      "NewStatus": "Todo",
+      "Comment": "Görev, \u0027Işıl Vural (İK Müdürü)\u0027 tarafından \u0027Leyla Ateş (İşe Alım Uzmanı)\u0027 kullanıcısından \u0027Ceyda Can (Yazılımcı)\u0027 kullanıcısına aktarıldı.\nAktarma Notu: Aktarma Notu: fds\nGörev, \u0027Teknik Departman\u0027 departmanına yeniden yönlendirildi.",
+      "ChangeDate": "2025-11-05T16:29:52.348122+03:00"
+    },
+    {
+      "Id": 10,
+      "ActionTaskId": 3,
+      "UserId": 11,
+      "OldStatus": "Todo",
+      "NewStatus": "Todo",
+      "Comment": "Görev, \u0027Burak Öz (Yazılım Lideri)\u0027 tarafından \u0027Ceyda Can (Yazılımcı)\u0027 kullanıcısından \u0027Burak Öz (Yazılım Lideri)\u0027 kullanıcısına aktarıldı.\nAktarma Notu: Aktarma Notu: ryt",
+      "ChangeDate": "2025-11-05T16:30:28.3022311+03:00"
+    }
+  ],
+  "WorkLogs": [],
+  "TaskComments": [],
+  "Departments": [
+    {
+      "Id": 1,
+      "Name": "Teknik Departman"
+    },
+    {
+      "Id": 2,
+      "Name": "Operasyon Departmanı"
+    },
+    {
+      "Id": 3,
+      "Name": "İnsan Kaynakları"
+    }
+  ],
+  "Categories": [
+    {
+      "Id": 101,
+      "Name": "Yazılım Geliştirme (Bug)",
+      "DepartmentId": 1,
+      "ResponsibleUserId": 11
+    },
+    {
+      "Id": 102,
+      "Name": "Sistem / Altyapı",
+      "DepartmentId": 1,
+      "ResponsibleUserId": 13
+    },
+    {
+      "Id": 103,
+      "Name": "Veritabanı Yönetimi",
+      "DepartmentId": 1,
+      "ResponsibleUserId": 12
+    },
+    {
+      "Id": 201,
+      "Name": "Kullanıcı Desteği",
+      "DepartmentId": 2,
+      "ResponsibleUserId": 21
+    },
+    {
+      "Id": 202,
+      "Name": "Bakım ve Onarım",
+      "DepartmentId": 2,
+      "ResponsibleUserId": 23
+    },
+    {
+      "Id": 203,
+      "Name": "Raporlama İsteği",
+      "DepartmentId": 2,
+      "ResponsibleUserId": null
+    },
+    {
+      "Id": 301,
+      "Name": "İşe Alım Süreçleri",
+      "DepartmentId": 3,
+      "ResponsibleUserId": 31
+    },
+    {
+      "Id": 302,
+      "Name": "Eğitim Planlama",
+      "DepartmentId": 3,
+      "ResponsibleUserId": 32
+    },
+    {
+      "Id": 303,
+      "Name": "Bordro ve Özlük İşleri",
+      "DepartmentId": 3,
+      "ResponsibleUserId": 33
+    }
+  ]
+}

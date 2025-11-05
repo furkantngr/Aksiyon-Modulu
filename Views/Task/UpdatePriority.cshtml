@@ -1,0 +1,41 @@
+@model UpdatePriorityViewModel
+@using HierarchicalTaskApp.Models
+@{
+    ViewData["Title"] = "Görevin Önceliğini Değiştir";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3>Öncelik Güncelle</h3>
+            </div>
+            <div class="card-body">
+                
+                <div class="alert alert-info">
+                    <strong>Görev:</strong> @Model.TaskTitle
+                </div>
+                
+                <div class="alert alert-warning">
+                    <strong>Mevcut Öncelik:</strong> @Model.CurrentPriority
+                </div>
+
+                <form asp-action="UpdatePriority" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="TaskId" />
+                    <input type="hidden" asp-for="CurrentPriority" />
+                    
+                    <div class="mb-3">
+                        <label asp-for="NewPriority" class="form-label"></label>
+                        <select asp-for="NewPriority" asp-items="Html.GetEnumSelectList<TaskPriority>()" class="form-select"></select>
+                        <span asp-validation-for="NewPriority" class="text-danger"></span>
+                    </div>
+
+                    <hr />
+                    <button type="submit" class="btn btn-danger">Önceliği Güncelle</button>
+                    <a asp-action="Details" asp-route-id="@Model.TaskId" class="btn btn-secondary">İptal</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

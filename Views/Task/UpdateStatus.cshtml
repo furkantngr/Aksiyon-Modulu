@@ -1,0 +1,41 @@
+@model UpdateStatusViewModel
+@using HierarchicalTaskApp.Models
+@{
+    ViewData["Title"] = "Update Task Status";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3>Update Status: @Model.TaskTitle</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <strong>Current Status:</strong> @Model.CurrentStatus
+                </div>
+
+                <form asp-action="UpdateStatus" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="TaskId" />
+                    
+                    <div class="mb-3">
+                        <label asp-for="NewStatus" class="form-label"></label>
+                        <select asp-for="NewStatus" asp-items="Html.GetEnumSelectList<HierarchicalTaskApp.Models.TaskStatus>()" class="form-select"></select>
+                        <span asp-validation-for="NewStatus" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Comment" class="form-label"></label>
+                        <textarea asp-for="Comment" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Comment" class="text-danger"></span>
+                    </div>
+
+                    <hr />
+                    <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                    <a asp-action="Details" asp-route-id="@Model.TaskId" class="btn btn-secondary">İptal</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

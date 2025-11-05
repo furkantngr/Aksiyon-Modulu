@@ -1,0 +1,143 @@
+@model ActionTask
+@{
+    ViewData["Title"] = "Yeni Görev Oluştur";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3>Yeni Görev Oluştur</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="DepartmentId" class="form-label"></label>
+                        <select asp-for="DepartmentId" class="form-select" asp-items="ViewBag.Departments">
+                            <option value="">-- Departman Seçin --</option>
+                        </select>
+                        <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CategoryId" class="form-label"></label>
+                        <select asp-for="CategoryId" class="form-select" disabled>
+                            <option value="">-- Önce Departman Seçin --</option>
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+                    
+                    <hr />
+
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    
+                    <hr />
+
+                    <div class="mb-3">
+                        <label asp-for="AssigneeId" class="form-label">Atanan Kişi (Manuel/Otomatik)</label>
+                        <select asp-for="AssigneeId" class="form-select" asp-items="ViewBag.Users">
+                            <option value="">-- Kişi Seçin --</option>
+                        </select>
+                        <span asp-validation-for="AssigneeId" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Priority" class="form-label"></label>
+                            <select asp-for="Priority" asp-items="Html.GetEnumSelectList<HierarchicalTaskApp.Models.TaskPriority>()" class="form-select"></select>
+                            <span asp-validation-for="Priority" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Deadline" class="form-label"></label>
+                            <input asp-for="Deadline" type="date" class="form-control" />
+                            <span asp-validation-for="Deadline" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Görevi Oluştur</button>
+                    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            
+            var deptDropdown = $("#DepartmentId");
+            var catDropdown = $("#CategoryId");
+            var userDropdown = $("#AssigneeId");
+
+            // 1. Departman değiştiğinde KATEGORİLERİ ve KULLANICILARI getir
+            deptDropdown.on("change", function () {
+                var deptId = $(this).val();
+                loadCategories(deptId);
+                loadUsers(deptId);
+            });
+
+            // 2. Kategori değiştiğinde Sorumlu Kullanıcıyı otomatik seç
+            catDropdown.on("change", function () {
+                var catId = $(this).val();
+                selectResponsibleUser(catId);
+            });
+            
+            // --- YARDIMCI FONKSİYONLAR ---
+
+            function loadCategories(deptId) {
+                catDropdown.empty().append('<option value="">-- Yükleniyor... --</option>');
+                if (!deptId) {
+                    catDropdown.empty().append('<option value="">-- Önce Departman Seçin --</option>').prop("disabled", true);
+                    return;
+                }
+                $.getJSON("/Task/GetCategories", { departmentId: deptId }, function (data) {
+                    catDropdown.empty().append('<option value="">-- Kategori Seçin --</option>');
+                    $.each(data, function (index, item) {
+                        catDropdown.append($('<option>', { value: item.value, text: item.text }));
+                    });
+                    catDropdown.prop("disabled", false);
+                });
+            }
+            
+            function loadUsers(deptId) {
+                userDropdown.empty().append('<option value="">-- Yükleniyor... --</option>').prop("disabled", true);
+                $.getJSON("/Task/GetUsersForDepartment", { departmentId: deptId || null }, function (data) {
+                    userDropdown.empty().append('<option value="">-- Kişi Seçin --</option>');
+                    $.each(data, function (index, item) {
+                        userDropdown.append($('<option>', { value: item.value, text: item.text }));
+                    });
+                    userDropdown.prop("disabled", false);
+                });
+            }
+            
+            function selectResponsibleUser(catId) {
+                if (!catId) {
+                    userDropdown.val("");
+                    return;
+                }
+                $.getJSON("/Task/GetResponsibleUser", { categoryId: catId }, function (data) {
+                    if (data && data.userId > 0) {
+                        userDropdown.val(data.userId);
+                    }
+                    else {
+                        userDropdown.val("");
+                    }
+                });
+            }
+        });
+    </script>
+}
