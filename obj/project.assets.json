@@ -207,11 +207,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\ft\\WebApplication1\\WebApplication1.csproj",
+      "projectUniqueName": "C:\\ft\\web\\Aksiyon-Mod-l-\\WebApplication1.csproj",
       "projectName": "WebApplication1",
-      "projectPath": "C:\\ft\\WebApplication1\\WebApplication1.csproj",
+      "projectPath": "C:\\ft\\web\\Aksiyon-Mod-l-\\WebApplication1.csproj",
       "packagesPath": "C:\\Users\\it.intern3\\.nuget\\packages\\",
-      "outputPath": "C:\\ft\\WebApplication1\\obj\\",
+      "outputPath": "C:\\ft\\web\\Aksiyon-Mod-l-\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\it.intern3\\AppData\\Roaming\\NuGet\\NuGet.Config"

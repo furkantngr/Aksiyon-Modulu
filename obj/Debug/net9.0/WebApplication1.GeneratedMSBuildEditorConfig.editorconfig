@@ -9,73 +9,73 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = WebApplication1
 build_property.RootNamespace = WebApplication1
-build_property.ProjectDir = C:\ft\WebApplication1\
+build_property.ProjectDir = C:\ft\web\Aksiyon-Mod-l-\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\ft\WebApplication1
+build_property.MSBuildProjectDirectory = C:\ft\web\Aksiyon-Mod-l-
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/ft/WebApplication1/Views/Auth/Login.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/Auth/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/Home/Index.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/Home/Privacy.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/Shared/Error.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/Task/Create.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/Task/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFza1xDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/Task/Details.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/Task/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFza1xEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/Task/FlagTask.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/Task/FlagTask.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFza1xGbGFnVGFzay5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/Task/Index.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/Task/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFza1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/Task/TransferTask.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/Task/TransferTask.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFza1xUcmFuc2ZlclRhc2suY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/Task/UpdatePriority.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/Task/UpdatePriority.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFza1xVcGRhdGVQcmlvcml0eS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/Task/UpdateStatus.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/Task/UpdateStatus.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFza1xVcGRhdGVTdGF0dXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/_ViewImports.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/_ViewStart.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/ft/WebApplication1/Views/Shared/_Layout.cshtml]
+[C:/ft/web/Aksiyon-Mod-l-/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-bddmc6yalx
